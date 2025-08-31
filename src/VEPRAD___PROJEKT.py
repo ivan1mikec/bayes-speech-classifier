@@ -8,7 +8,6 @@ from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# 1. Paths and parameters
 WAV_DIR = "./sm_04_wav"
 LAB_DIR = "./sm_04_lab"
 SAMPLE_RATE = 16000
@@ -17,7 +16,7 @@ N_MFCC = 13
 features = []
 labels = []
 i = 0
-# Loop through .wav and .lab files
+
 for file in os.listdir(WAV_DIR):
     if file.endswith(".wav"):
         base = os.path.splitext(file)[0]
@@ -28,10 +27,9 @@ for file in os.listdir(WAV_DIR):
             print(f"[!] Missing .lab for {base}")
             continue
 
-        # Load audio
         y, sr = librosa.load(wav_path, sr=SAMPLE_RATE)
         i = i +1
-        # Process .lab file
+        
         with open(lab_path, "r") as f:
             for line in f:
                 try:
@@ -50,7 +48,6 @@ for file in os.listdir(WAV_DIR):
                     if np.max(np.abs(segment)) < 0.01:
                         continue
 
-                    # MFCC extraction
                     mfcc = librosa.feature.mfcc(y=segment, sr=sr, n_mfcc=N_MFCC, n_fft=512, hop_length=128)
 
                     if mfcc.shape[1] < 9:
@@ -71,14 +68,12 @@ print(i)
 
 from sklearn.preprocessing import StandardScaler
 
-# 3. Statistics before filtering
 print(f"\nTotal phoneme samples: {len(features)}")
 print(f"Number of unique phonemes: {len(set(labels))}")
 print("Most common phonemes:")
 for phon, count in Counter(labels).most_common(10):
     print(f"  {phon}: {count}")
 
-# === POBOLJSANJA ===
 
 long_to_short = {
     "a:": "a",
@@ -88,6 +83,7 @@ long_to_short = {
     "u:": "u",
     "r:": "r"
 }
+
 labels_mapped = [long_to_short.get(l, l) for l in labels]
 
 counts = Counter(labels_mapped)
@@ -131,3 +127,4 @@ plt.ylabel("Actual")
 plt.title("Confusion Matrix - Bayes Classifier")
 plt.tight_layout()
 plt.show()
+
